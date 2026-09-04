@@ -2,6 +2,7 @@ import express, { type Request, type Response } from "express";
 import swaggerRouter from "./routes/swagger.router.js";
 import cors from "cors"
 import { pool } from "./config/db.js";
+import productRouter from "./routes/product.routes.js";
 
 const port = process.env.PORT || 3000; 
 
@@ -23,16 +24,7 @@ app.get("/", (req: Request, res: Response) => {
     });
 });
 
-app.get("/api/menu", async (req: Request, res: Response) => {
-    try {
-        const result = await pool.query("SELECT * FROM productos;");
-        res.json(result.rows );
-    }
-    catch (error) {
-        console.error("Error al consultar la Base de Datos");
-        res.status(500).json({ message: "Internal Server Error" });
-    }
-})
+app.use("/api", productRouter);
 
 app.listen(port, async () => {
     console.log(`URL: http://localhost:${port}`);
