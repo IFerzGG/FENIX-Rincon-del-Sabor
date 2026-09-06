@@ -4,7 +4,8 @@ export interface Product {
     id: number;
     nombre: string;
     precio: number;
-    categoria: string;
+    descripcion: string;
+    stock: number;
 }
 
 export type CrearProductoInput = Omit<Product, 'id'>;
@@ -21,16 +22,16 @@ export const ModelProduct = {
         return result.rows[0] || null;
     },
     createProduct: async (product: CrearProductoInput): Promise<Product> => {
-        const { nombre, precio, categoria } = product;
-        const query = "INSERT INTO productos (nombre, precio, categoria) VALUES ($1, $2, $3) RETURNING *;";
-        const values = [nombre, precio, categoria];
+        const { nombre, precio, descripcion, stock } = product;
+        const query = "INSERT INTO productos (nombre, precio, descripcion, stock) VALUES ($1, $2, $3, $4) RETURNING *;";
+        const values = [nombre, precio, descripcion, stock];
         const result = await pool.query(query, values);
         return result.rows[0];
     },
     updateProduct: async (id: number, product: ActualizarProductoInput): Promise<Product | null> => {
-        const { nombre, precio, categoria } = product;
-        const query = "UPDATE productos SET nombre = $1, precio = $2, categoria = $3 WHERE id = $4 RETURNING *;";
-        const values = [nombre, precio, categoria, id];
+        const { nombre, precio, descripcion, stock } = product;
+        const query = "UPDATE productos SET nombre = $1, precio = $2, descripcion = $3, stock = $4 WHERE id = $5 RETURNING *;";
+        const values = [nombre, precio, descripcion, stock, id];
         const result = await pool.query(query, values);
         return result.rows[0] || null;
     },
