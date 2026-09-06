@@ -56,10 +56,13 @@
                 "nombre": {
                   "example": "any"
                 },
+                "descripcion": {
+                  "example": "any"
+                },
                 "precio": {
                   "example": "any"
                 },
-                "categoria": {
+                "stock": {
                   "example": "any"
                 }
               }

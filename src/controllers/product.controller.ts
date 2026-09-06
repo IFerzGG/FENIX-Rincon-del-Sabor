@@ -44,8 +44,8 @@ export const postProduct = async (req: Request, res: Response): Promise<void> =>
     #swagger.description = 'Crear un nuevo producto en la base de datos.'
     */
     try {
-        const{ nombre, precio, categoria } = req.body;
-        if (!nombre || !precio || !categoria) {
+        const{ nombre, descripcion, precio, stock } = req.body;
+        if (!nombre || !precio || !descripcion || stock === undefined || stock === null) {
             res.status(400).json({ message: "Faltan campos requeridos" });
             return;
         }

@@ -1,0 +1,21 @@
+import { z } from "zod";
+
+export const productSchema = z.object({
+    nombre: z
+    .string({message: "El nombre debe ser obligatorio"})
+    .min(3, "el nombre debe tener almenos 3 caracteres")
+    .trim()
+    .min(1),
+    descripcion: z
+    .string({message: "La descripción debe ser obligatoria"})
+    .min(3, "la descripción debe tener al menos 3 caracteres")
+    .trim()
+    .min(1),
+    precio: z
+    .number({message: "El precio debe ser obligatorio"})
+    .positive("el precio debe ser mayor a 0"),
+    stock: z
+    .number({message: "El stock debe ser un valor numerico"})
+    .refine(val => val >=0, {message: "El stock debe ser mayor o igual a 0"})
+    .optional(),
+});

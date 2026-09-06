@@ -1,4 +1,6 @@
 import { Router } from "express";
+import {validarProducto} from "../middleware/validate-product.js";
+import { productSchema } from "../schema/product.schema.js";
 import {getMenu, 
         getProduct, 
         postProduct, 
@@ -9,8 +11,8 @@ const router: Router = Router();
 
 router.get("/menu", getMenu);
 router.get("/menu/:id", getProduct);
-router.post("/menu", postProduct);
-router.put("/menu/:id", putProduct);
+router.post("/menu",validarProducto(productSchema), postProduct);
+router.put("/menu/:id",putProduct);
 router.delete("/menu/:id", deleteProduct);
 
 export default router;
