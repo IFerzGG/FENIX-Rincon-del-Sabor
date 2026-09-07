@@ -29,10 +29,16 @@ export const ModelProduct = {
         return result.rows[0];
     },
     updateProduct: async (id: number, product: ActualizarProductoInput): Promise<Product | null> => {
-        const { nombre, precio, descripcion, stock } = product;
-        const query = "UPDATE productos SET nombre = $1, precio = $2, descripcion = $3, stock = $4 WHERE id = $5 RETURNING *;";
-        const values = [nombre, precio, descripcion, stock, id];
-        const result = await pool.query(query, values);
+        const campos = Object.keys(product) as (keyof ActualizarProductoInput)[];
+        const setClause = campos
+            .map((campo, index) => `${campo} = $${index + 1}`)
+            .join(", ");
+        const valores = campos.map((campo) => product[campo]);
+        const result = await pool.query(
+            `UPDATE productos 
+                SET ${setClause} 
+                WHERE id = $${campos.length + 1} 
+                RETURNING *;`, [...valores, id]);
         return result.rows[0] || null;
     },
     deleteProduct: async (id: number): Promise<boolean> => {
