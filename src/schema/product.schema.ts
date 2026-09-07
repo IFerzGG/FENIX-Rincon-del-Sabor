@@ -19,3 +19,8 @@ export const productSchema = z.object({
     .refine(val => val >=0, {message: "El stock debe ser mayor o igual a 0"})
     .optional(),
 });
+
+export const updateProductSchema = productSchema
+    .partial()
+    .refine((data) => Object.keys(data).length > 0, {
+        message: "Debe proporcionar al menos un campo para actualizar"});
