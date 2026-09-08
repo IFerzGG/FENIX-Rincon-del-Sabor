@@ -21,3 +21,23 @@ export const updateCustomerSchema = customerSchema
     .partial()
     .refine((data) => Object.keys(data).length > 0, {
         message: "Debe proporcionar al menos un campo para actualizar"});
+
+export const customerQueryParams = z.object({
+  page: z
+    .coerce.number()
+    .int()
+    .positive()
+    .default(1),
+  limit: z
+    .coerce.number()
+    .int()
+    .positive()
+    .default(10),
+  nombre: z
+    .string()
+    .trim()
+    .optional(),
+});
+
+export type CustomerQueryParams = z.infer<typeof customerQueryParams>;
+export type CustomerSchema = z.infer<typeof customerSchema>;
