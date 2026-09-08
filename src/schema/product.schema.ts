@@ -24,3 +24,33 @@ export const updateProductSchema = productSchema
     .partial()
     .refine((data) => Object.keys(data).length > 0, {
         message: "Debe proporcionar al menos un campo para actualizar"});
+
+export const productQueryParams = z.object({
+  page: z
+    .coerce.number()
+    .int()
+    .positive()
+    .default(1),
+  limit: z
+    .coerce.number()
+    .int()
+    .positive()
+    .default(10),
+  nombre: z
+    .string()
+    .trim()
+    .optional(),
+  stock: z
+    .coerce.number()
+    .int()
+    .nonnegative()
+    .optional(),
+  minPrice: z
+    .coerce.number()
+    .optional(),
+  maxPrice: z
+    .coerce.number()
+    .optional(),
+});
+
+export type ProductQueryParams = z.infer<typeof productQueryParams>;

@@ -4,6 +4,7 @@ import cors from "cors"
 import { pool } from "./config/db.js";
 import productRouter from "./routes/product.routes.js";
 import customersRouter from "./routes/customers.routes.js";
+import ventaRoutes from "./routes/ventaRoutes.js";
 
 const port = process.env.PORT || 3000; 
 
@@ -27,6 +28,7 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use("/api", productRouter);
 app.use("/api", customersRouter);
+app.use("/api", ventaRoutes);
 
 app.listen(port, async () => {
     console.log(`URL: http://localhost:${port}`);

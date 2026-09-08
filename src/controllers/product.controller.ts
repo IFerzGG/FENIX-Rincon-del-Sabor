@@ -1,15 +1,22 @@
 import type { Request, Response } from "express";
 import { ModelProduct } from "../models/product.model.js";
+import { productQueryParams } from "../schema/product.schema.js";
+import { productService } from "../services/productServices.js";
 
-export const getMenu = async (req: Request, res: Response): Promise<void> => {
+export const getMenu = async (req: Request, res: Response) => {
     /*#swagger.tags = ['Products']
     #swagger.summary = 'Obtener el menú de productos'
     #swagger.description = 'Obtener el menú de productos sin excepción de categoría. Devuelve un array de objetos con los productos disponibles en la base de datos.'
     */
     try {
-        const products = await ModelProduct.getAllProducts();
-        res.json(products);
-    } catch (error) {
+        const resultQuery = productQueryParams.safeParse(req.query);
+        console.log(resultQuery);
+        if (!resultQuery.success) {
+            return res.status(400).json({ error: resultQuery.error.issues});
+        }
+        const result = await productService.getProductsFilters(resultQuery.data);
+        res.json(result);
+    }   catch (error) {
         console.error("Error al consultar el menú:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }

@@ -1,4 +1,5 @@
 import { pool } from '../config/db.js';
+import type { ProductQueryParams } from "../schema/product.schema.js";
 
 export interface Product {
     id: number;
@@ -44,5 +45,61 @@ export const ModelProduct = {
     deleteProduct: async (id: number): Promise<boolean> => {
         const result = await pool.query("DELETE FROM productos WHERE id = $1;", [id]);
         return (result.rowCount ?? 0) > 0 ;
+    },
+    getFindFilter: async (filtro: ProductQueryParams) => {
+    const condiciones: string[] = [];
+    const parametros: any[] = [];
+    let index = 1;
+
+    //la construccion de las condiciones
+    if (filtro.nombre !== undefined) {
+      condiciones.push(`nombre ILIKE $${index}`);
+      parametros.push(`%${filtro.nombre}%`);
+      index++;
     }
+
+    if (filtro.stock !== undefined) {
+      condiciones.push(`stock = $${index}`);
+      parametros.push(filtro.stock);
+      index++;
+    }
+
+    if (filtro.minPrice !== undefined) {
+      condiciones.push(`precio >= $${index}`);
+      parametros.push(filtro.minPrice);
+      index++;
+    }
+    if (filtro.maxPrice !== undefined) {
+      condiciones.push(`precio <= $${index}`);
+      parametros.push(filtro.maxPrice);
+      index++;
+    }
+    //Construimos WHERE con ADD
+    const where = condiciones.length > 0 
+      ? `WHERE ${condiciones.join(` AND `)}` 
+      : "";
+    //Conteo Total de productos que coinciden con los filtros
+    const countQuery = `SELECT COUNT(*) FROM productos ${where}`;
+    const countResult = await pool.query(countQuery, parametros);
+    const total = Number(countResult.rows[0].count);
+    //Paginacion-Siempre al final, usando el indice actual
+    const page = filtro.page ?? 1;
+    const limit = filtro.limit ?? 10;
+    const offset = (page - 1) * limit;
+    parametros.push(limit);
+    parametros.push(offset);
+    //Agregamos LIMIT y OFFSET para mandar a SQL
+    const sql = ` SELECT * FROM productos ${where} ORDER BY id ASC
+      LIMIT $${index} 
+      OFFSET $${index + 1}`;
+    const { rows } = await pool.query(sql, parametros);
+
+    return {
+      data: rows,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit) || 1,
+    };
+  },
 };
