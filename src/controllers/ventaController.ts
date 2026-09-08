@@ -11,7 +11,7 @@ export const getVenta = async (req: Request, res: Response): Promise<void> => {
         const ventas = await ModelVentas.getAllVenta();
         res.json(ventas);
     } catch (error) {
-        console.error("Error al consultar el menú:", error);
+        console.error("Error al consultar las ventas:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 };
@@ -29,12 +29,12 @@ export const getVentaId = async (req: Request, res: Response): Promise<void> => 
         }
         const ventas = await ModelVentas.getVentaById(id);
         if (!ventas) {
-            res.status(404).json({ message: "Cliente no encontrado" });
+            res.status(404).json({ message: "Venta no encontrado" });
             return;
         }
         res.json(ventas);
     } catch (error) {
-        console.error("Error al consultar el cliente:", error);
+        console.error("Error al consultar la venta:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 };
@@ -53,7 +53,7 @@ export const postVenta = async (req: Request, res: Response): Promise<void> => {
         const ventas = await ModelVentas.createVenta(validar.data);
         res.status(201).json(ventas);
     } catch (error) {
-        console.error("Error al crear el cliente:", error);
+        console.error("Error al crear la venta:", error);
         res.status(500).json({ messazge: "Internal Server Error" });
     }
 };
@@ -71,12 +71,12 @@ export const putVenta = async (req: Request, res: Response): Promise<void> => {
         }
         const ventas = await ModelVentas.updateVenta(id, req.body);
         if (!ventas) {
-            res.status(404).json({ message: "Cliente no encontrado" });
+            res.status(404).json({ message: "Venta no encontrado" });
             return;
         }
         res.json(ventas);
     } catch (error) {
-        console.error("Error al actualizar el cliente:", error);
+        console.error("Error al actualizar la venta:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 };

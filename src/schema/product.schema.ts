@@ -16,8 +16,7 @@ export const productSchema = z.object({
     .positive("el precio debe ser mayor a 0"),
     stock: z
     .number({message: "El stock debe ser un valor numerico"})
-    .refine(val => val >=0, {message: "El stock debe ser mayor o igual a 0"})
-    .optional(),
+    .refine(val => val >=0, {message: "El stock debe ser mayor o igual a 0"}),
 });
 
 export const updateProductSchema = productSchema
@@ -54,3 +53,4 @@ export const productQueryParams = z.object({
 });
 
 export type ProductQueryParams = z.infer<typeof productQueryParams>;
+export type ProductSchema = z.infer<typeof productSchema>;

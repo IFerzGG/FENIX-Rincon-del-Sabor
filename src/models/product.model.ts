@@ -19,7 +19,7 @@ export const ModelProduct = {
         return result.rows;
     },
     getProductById: async (id: number): Promise<Product | null> => {
-        const result = await pool.query("SELECT * FROM productos WHERE id = $1;", [id]);
+        const result = await pool.query("SELECT * FROM productos WHERE id_productos = $1;", [id]);
         return result.rows[0] || null;
     },
     createProduct: async (product: CrearProductoInput): Promise<Product> => {
@@ -38,12 +38,12 @@ export const ModelProduct = {
         const result = await pool.query(
             `UPDATE productos 
                 SET ${setClause} 
-                WHERE id = $${campos.length + 1} 
+                WHERE id_productos = $${campos.length + 1} 
                 RETURNING *;`, [...valores, id]);
         return result.rows[0] || null;
     },
     deleteProduct: async (id: number): Promise<boolean> => {
-        const result = await pool.query("DELETE FROM productos WHERE id = $1;", [id]);
+        const result = await pool.query("DELETE FROM productos WHERE id_productos = $1;", [id]);
         return (result.rowCount ?? 0) > 0 ;
     },
     getFindFilter: async (filtro: ProductQueryParams) => {
@@ -54,7 +54,7 @@ export const ModelProduct = {
     //la construccion de las condiciones
     if (filtro.nombre !== undefined) {
       condiciones.push(`nombre ILIKE $${index}`);
-      parametros.push(`%${filtro.nombre}%`);
+      parametros.push(filtro.nombre);
       index++;
     }
 
@@ -89,7 +89,7 @@ export const ModelProduct = {
     parametros.push(limit);
     parametros.push(offset);
     //Agregamos LIMIT y OFFSET para mandar a SQL
-    const sql = ` SELECT * FROM productos ${where} ORDER BY id ASC
+    const sql = ` SELECT * FROM productos ${where} ORDER BY id_productos ASC
       LIMIT $${index} 
       OFFSET $${index + 1}`;
     const { rows } = await pool.query(sql, parametros);
@@ -102,4 +102,8 @@ export const ModelProduct = {
       totalPages: Math.ceil(total / limit) || 1,
     };
   },
+  findByName: async (name:string) => {
+    const {rows} = await pool.query("SELECT * FROM productos WHERE LOWER(nombre) = LOWER($1);", [name]);
+    return rows[0];
+  }
 };

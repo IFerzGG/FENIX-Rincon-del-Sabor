@@ -1,5 +1,7 @@
 import type { Request, Response } from "express";
 import {ModelCustomer} from "../models/customer.model.js";
+import { customerService } from "../services/customerService.js";
+import { customerQueryParams } from "../schema/customer.schema.js";
 
 export const getCustomers = async (req: Request, res: Response): Promise<void> => {
     /*#swagger.tags = ['Customers']
@@ -7,10 +9,15 @@ export const getCustomers = async (req: Request, res: Response): Promise<void> =
     #swagger.description = 'Obtener el menú de clientes sin excepción de categoría. Devuelve un array de objetos con los clientes disponibles en la base de datos.'
     */
     try {
-        const customers = await ModelCustomer.getAllCustomers();
+        const validar = customerQueryParams.safeParse(req.query);
+        if(!validar.success){
+            res.status(400).json({error:"Invalido Query"});
+            return;
+        }
+        const customers = await customerService.getCustomerFilter(validar.data);
         res.json(customers);
     } catch (error) {
-        console.error("Error al consultar el menú:", error);
+        console.error("Error al consultar los clientes:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 };

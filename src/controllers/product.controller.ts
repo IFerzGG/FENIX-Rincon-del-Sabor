@@ -9,12 +9,11 @@ export const getMenu = async (req: Request, res: Response) => {
     #swagger.description = 'Obtener el menú de productos sin excepción de categoría. Devuelve un array de objetos con los productos disponibles en la base de datos.'
     */
     try {
-        const resultQuery = productQueryParams.safeParse(req.query);
-        console.log(resultQuery);
-        if (!resultQuery.success) {
-            return res.status(400).json({ error: resultQuery.error.issues});
+        const validar = productQueryParams.safeParse(req.query)
+        if(!validar.success){
+            return res.status(400).json({error:"Error al validar query"});
         }
-        const result = await productService.getProductsFilters(resultQuery.data);
+        const result = await productService.getProductsFilters(validar.data);
         res.json(result);
     }   catch (error) {
         console.error("Error al consultar el menú:", error);
@@ -56,10 +55,16 @@ export const postProduct = async (req: Request, res: Response): Promise<void> =>
             res.status(400).json({ message: "Faltan campos requeridos" });
             return;
         }
-        const product = await ModelProduct.createProduct(req.body);
+        const product = await productService.createProduct(req.body);
         res.status(201).json(product);
     } catch (error) {
         console.error("Error al crear el producto:", error);
+        if (error instanceof Error && error.message === "El producto ya existe") {
+            res.status(409).json({
+             message: error.message,
+            });
+            return;
+        }
         res.status(500).json({ message: "Internal Server Error" });
     }
 };

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {validarProducto} from "../middleware/validate-product.js";
-import { productSchema } from "../schema/product.schema.js";
+import { productQueryParams, productSchema } from "../schema/product.schema.js";
 import {getMenu, 
         getProduct, 
         postProduct, 

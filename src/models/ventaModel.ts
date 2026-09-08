@@ -23,23 +23,32 @@ export const ModelVentas = {
         const result = await pool.query<VentaConCliente>(query);
         return result.rows;
     },
-    getVentaById: async (id: number): Promise<Ventas | null> => {
-        const result = await pool.query("SELECT * FROM venta WHERE id = $1;", [id]);
+    getVentaById: async (id: number): Promise<VentaConCliente | null> => {
+        const query = `SELECT venta.id, venta.fecha, venta.total, venta.id_cliente,
+            customers.nombre AS nombre_cliente
+            FROM venta 
+            INNER JOIN customers ON venta.id_cliente = customers.id
+            WHERE venta.id = $1;`;
+        const result = await pool.query<VentaConCliente>(query, [id]);
         return result.rows[0] || null;
     },
-    createVenta: async (customer: CrearVentasInput): Promise<Ventas> => {
-        const { fecha, total, id_cliente } = customer;
+    createVenta: async (sell: CrearVentasInput): Promise<Ventas> => {
+        const { fecha, total, id_cliente } = sell;
         const query = "INSERT INTO venta (fecha, total, id_cliente) VALUES ($1, $2, $3) RETURNING *;";
         const values = [fecha, total, id_cliente];
-        const result = await pool.query(query, values);
-        return result.rows[0];
+        const result = await pool.query<Ventas>(query, values);
+        const venta = result.rows[0];
+        if (!venta) {
+            throw new Error('No se pudo crear la venta');
+        }
+        return venta;
     },
-    updateVenta: async (id: number, customer: ActualizarVentasInput): Promise<Ventas | null> => {
-        const campos = Object.keys(customer) as (keyof ActualizarVentasInput)[];
+    updateVenta: async (id: number, venta: ActualizarVentasInput): Promise<Ventas | null> => {
+        const campos = Object.keys(venta) as (keyof ActualizarVentasInput)[];
         const setClause = campos
             .map((campo, index) => `${campo} = $${index + 1}`)
             .join(", ");
-        const valores = campos.map((campo) => customer[campo]);
+        const valores = campos.map((campo) => venta[campo]);
         const result = await pool.query(
             `UPDATE venta 
                 SET ${setClause} 
